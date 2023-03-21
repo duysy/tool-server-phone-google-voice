@@ -69,12 +69,11 @@ def getPhoneNone():
 @app.route('/getPhoneWaitCode')
 def getPhoneWaitCode():
     global data
-    output = {}
     for phoneNumber, value in data.items():
         if value.get("statusPhone") == "WAITCODE":
-            output["phoneNumber"] = phoneNumber
             data[phoneNumber]["statusPhone"] = "WAITCODEDONT"
-            return jsonify({**data[phoneNumber], **{"phoneNumber": phoneNumber}})
+            output = {**data[phoneNumber], **{"phoneNumber": phoneNumber}}
+            return jsonify(output)
     return jsonify({})
 
 
