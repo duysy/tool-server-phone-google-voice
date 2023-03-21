@@ -11,11 +11,19 @@ g_state = True
 def index():
     if request.method == 'POST':
         phone_number = request.form['phoneNumber']
+        email = request.form['email']
+        password = request.form['password']
         code_number = request.form['codeNumber']
-        print(phone_number, code_number)
+        print(phone_number, email, password, code_number)
         if code_number:
-            return redirect(url_for('putCode', phoneNumber=phone_number, codeNumber=code_number))
-        return redirect(url_for('putPhone', phoneNumber=phone_number))
+            return redirect(url_for('putCode',
+                                    phoneNumber=phone_number,
+                                    codeNumber=code_number
+                                    ))
+        return redirect(url_for('putPhone', phoneNumber=phone_number,
+                                email=email,
+                                password=password
+                                ))
     return render_template('index.html')
 
 
@@ -23,8 +31,14 @@ def index():
 def putPhone():
     global data
     phoneNumber = request.args.get('phoneNumber')
+    email = request.args.get('email')
+    password = request.args.get('password')
     if data.get(phoneNumber) == None:
-        data[phoneNumber] = {"statusPhone": "NEW", "codeNumber": None}
+        data[phoneNumber] = {"statusPhone": "NEW",
+                             "email": email,
+                             "password": password,
+                             "codeNumber": None
+                             }
         return str(phoneNumber)
     else:
         return str(phoneNumber + " available")
@@ -44,14 +58,24 @@ def putCode():
 def getPhoneNone():
     global data
     output = {}
-    for key, value in data.items():
+    for phoneNumber, value in data.items():
         if value.get("statusPhone") == "NEW":
-            output["phoneNumber"] = key
-            data[key]["statusPhone"] = "WAITCODE"
-            # return output
-            return key
-    # return jsonify({})
+            output["phoneNumber"] = phoneNumber
+            data[phoneNumber]["statusPhone"] = "WAITCODE"
+            return phoneNumber
     return ""
+
+
+@app.route('/getPhoneWaitCode')
+def getPhoneWaitCode():
+    global data
+    output = {}
+    for phoneNumber, value in data.items():
+        if value.get("statusPhone") == "WAITCODE":
+            output["phoneNumber"] = phoneNumber
+            data[phoneNumber]["statusPhone"] = "WAITCODEDONT"
+            return jsonify(data[phoneNumber])
+    return jsonify({})
 
 
 @app.route('/getCode')
