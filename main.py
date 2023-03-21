@@ -74,7 +74,7 @@ def getPhoneWaitCode():
         if value.get("statusPhone") == "WAITCODE":
             output["phoneNumber"] = phoneNumber
             data[phoneNumber]["statusPhone"] = "WAITCODEDONT"
-            return jsonify(data[phoneNumber])
+            return jsonify({**data[phoneNumber], **{"phoneNumber": phoneNumber}})
     return jsonify({})
 
 
